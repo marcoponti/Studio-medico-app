@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#3498db">
+    <title>Studio Medico App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.4;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .emergency-banner {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin: 0;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .emergency-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .call-button {
+            background: white;
+            color: #e74c3c;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 15px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .call-button:active {
+            transform: scale(0.95);
+        }
+        
+        .status-banner {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 15px 20px;
+            margin: 0;
+            text-align: center;
+            font-weight: 500;
+            position: sticky;
+            top: 80px;
+            z-index: 98;
+        }
+        
+        .status-banner.closed {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+        }
+        
+        .status-banner.emergency {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            animation: pulse 2s infinite;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 135px;
+            z-index: 99;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            border: none;
+            background: none;
+            font-size: 0.8em;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background: rgba(52, 152, 219, 0.05);
+        }
+        
+        .nav-tab:active {
+            transform: scale(0.95);
+        }
+        
+        .content {
+            padding: 0;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+        }
+        
+        .card-content {
+            padding: 15px;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .quick-action {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .quick-action:active {
+            transform: scale(0.95);
+        }
+        
+        .quick-action.available {
+            border-color: #27ae60;
+            background: rgba(39, 174, 96, 0.05);
+        }
+        
+        .quick-action.busy {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.05);
+            opacity: 0.7;
+        }
+        
+        .action-icon {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        
+        .action-text {
+            font-size: 0.9em;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .contact-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+        
+        .contact-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .phone-btn {
+            background: #27ae60;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9em;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .phone-btn:active {
+            transform: scale(0.95);
+            background: #229954;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+        
+        .doctor-info {
+            flex: 1;
+        }
+        
+        .doctor-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .doctor-location {
+            font-size: 0.8em;
+            color: #e74c3c;
+            font-style: italic;
+        }
+        
+        .schedule-times {
+            text-align: right;
+            font-size: 0.85em;
+            color: #27ae60;
+            font-weight: 500;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .wait-timer {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .notes-section {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .notes-input {
+            width: 100%;
+            min-height: 80px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 0.9em;
+            resize: vertical;
+        }
+        
+        .notes-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .save-note-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .save-note-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .call-history {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-time {
+            font-size: 0.8em;
+            color: #7f8c8d;
+        }
+        
+        .map-section {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .map-header {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+        }
+        
+        .location-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .location-item:last-child {
+            border-bottom: none;
+        }
+        
+        .location-name-map {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .location-address {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .direction-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .direction-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .bottom-padding {
+            height: 50px;
+        }
+        
+        .floating-emergency {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #e74c3c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5em;
+            box-shadow: 0 4px 20px rgba(231, 76, 60, 0.4);
+            z-index: 1000;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .booking-section {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .booking-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .website-btn {
+            background: white;
+            color: #27ae60;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 15px;
+            font-size: 1.1em;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .website-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .info-text {
+            font-size: 0.9em;
+            color: #5a6c7d;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 350px) {
+            .nav-tab {
+                font-size: 0.7em;
+                padding: 10px 5px;
+            }
+            
+            .emergency-number {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🏥 Studio Medico</h1>
+            <p>La tua salute a portata di mano</p>
+        </div>
+        
+        <div class="emergency-banner">
+            <div>🚨 <strong>GUARDIA MEDICA</strong></div>
+            <div class="emergency-number">116117</div>
+            <a href="tel:116117" class="call-button">📞 CHIAMA ORA</a>
+            <div style="font-size: 0.8em; margin-top: 10px; opacity: 0.9;">
+                Servizio di Continuità Assistenziale
+            </div>
+        </div>
+        
+        <div id="status-banner" class="status-banner">
+            ⏰ Controllo disponibilità...
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('today')">📋 Oggi</button>
+            <button class="nav-tab" onclick="showTab('schedule')">📅 Orari</button>
+            <button class="nav-tab" onclick="showTab('contacts')">📞 Contatti</button>
+            <button class="nav-tab" onclick="showTab('booking')">💻 Prenota</button>
+            <button class="nav-tab" onclick="showTab('tools')">🛠️ Strumenti</button>
+        </div>
+        
+        <div class="content">
+            <!-- TAB OGGI -->
+            <div id="today" class="tab-content active">
+                <div class="quick-actions">
+                    <div class="quick-action" onclick="findAvailableNow()">
+                        <div class="action-icon">🟢</div>
+                        <div class="action-text">Chi è Disponibile ORA?</div>
+                    </div>
+                    <div class="quick-action" onclick="showWaitCalculator()">
+                        <div class="action-icon">⏱️</div>
+                        <div class="action-text">Calcola Attesa</div>
+                    </div>
+                    <div class="quick-action" onclick="setReminder()">
+                        <div class="action-icon">🔔</div>
+                        <div class="action-text">Imposta Promemoria</div>
+                    </div>
+                    <div class="quick-action" onclick="showDirections()">
+                        <div class="action-icon">🗺️</div>
+                        <div class="action-text">Come Arrivare</div>
+                    </div>
+                </div>
+                
+                <div id="availability-result" style="display: none;" class="card">
+                    <div class="card-header">🟢 Disponibilità Attuale</div>
+                    <div class="card-content" id="availability-content"></div>
+                </div>
+                
+                <div id="wait-calculator" style="display: none;" class="wait-timer">
+                    <div>⏱️ <strong>Tempo Stimato di Attesa</strong></div>
+                    <div id="wait-time" style="font-size: 1.2em; margin-top: 8px;"></div>
+                </div>
+                
+                <div class="call-history">
+                    <div class="section-title">📞 Cronologia Chiamate</div>
+                    <div id="call-history-list">
+                        <div style="text-align: center; color: #7f8c8d; font-style: italic; padding: 20px;">
+                            Nessuna chiamata registrata oggi
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="notes-section">
+                    <div class="section-title">📝 Note Personali</div>
+                    <textarea id="personal-notes" class="notes-input" placeholder="Scrivi qui le tue note sui prossimi appuntamenti, domande per il medico, etc..."></textarea>
+                    <button class="save-note-btn" onclick="saveNotes()">💾 Salva Note</button>
+                </div>
+            </div>
+            
+            <!-- TAB ORARI -->
+            <div id="schedule" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        📅 Orari Ambulatori Medici
+                    </div>
+                    <div class="card-content">
+                        <div class="schedule-item">
+                            <div class="doctor-info">
+                                <div class="doctor-name">Dott.ssa MANFREDINI</div>
+                                <div class="doctor-location">Piazza Costituzione</div>
+                            </div>
+                            <div class="schedule-times">
+                                Mar: 16:00-18:30<br>
+                                Mer: 08:00-11:30<br>
+                                Gio: 14:00-18:00
+                            </div>
+                        </div>
+                        
+                        <div class="schedule-item">
+                            <div class="doctor-info">
+                                <div class="doctor-name">Dott.ssa MOSCHINI</div>
+                                <div class="doctor-location">Piazza Costituzione</div>
+                            </div>
+                            <div class="schedule-times">
+                                Lun: 15:00-18:00<br>
+                                Mar: 08:30-12:30<br>
+                                Gio: 08:00-12:00<br>
+                                Ven: 08:00-12:00
+                            </div>
+                        </div>
+                        
+                        <div class="schedule-item">
+                            <div class="doctor-info">
+                                <div class="doctor-name">Dott.ssa GOVI</div>
+                                <div class="doctor-location">Piazza Costituzione</div>
+                            </div>
+                            <div class="schedule-times">
+                                Lun: 15:00-19:00<br>
+                                Mar: 08:30-12:00<br>
+                                Gio: 15:00-19:00
+                            </div>
+                        </div>
+                        
+                        <div class="schedule-item">
+                            <div class="doctor-info">
+                                <div class="doctor-name">Dott.ssa FORNACIARI</div>
+                                <div class="doctor-location">Piazza Costituzione</div>
+                            </div>
+                            <div class="schedule-times">
+                                Lun: 08:45-12:15<br>
+                                Mar: 15:30-19:00<br>
+                                Mer: 15:30-19:00<br>
+                                Gio: 08:45-12:00<br>
+                                Ven: 08:45-13:00
+                            </div>
+                        </div>
+                        
+                        <div class="schedule-item">
+                            <div class="doctor-info">
+                                <div class="doctor-name">Dott.ssa PASQUINI</div>
+                                <div class="doctor-location">Piazza Costituzione</div>
+                            </div>
+                            <div class="schedule-times">
+                                Lun: 08:30-09:30<br>
+                                Mer: 09:30-10:30<br>
+                                Ven: 17:00-19:00
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        📍 Sede Via De Sanctis
+                    </div>
+                    <div class="card-content">
+                        <div class="schedule-item">
+                            <div class="doctor-info">
+                                <div class="doctor-name">Dott.ssa MANFREDINI</div>
+                            </div>
+                            <div class="schedule-times">
+                                Lun: 08:00-12:00<br>
+                                Ven: 08:00-12:00
+                            </div>
+                        </div>
+                        
+                        <div class="schedule-item">
+                            <div class="doctor-info">
+                                <div class="doctor-name">Dott.ssa MOSCHINI</div>
+                            </div>
+                            <div class="schedule-times">
+                                Mer: 15:00-18:00
+                            </div>
+                        </div>
+                        
+                        <div class="schedule-item">
+                            <div class="doctor-info">
+                                <div class="doctor-name">Dott.ssa GOVI</div>
+                            </div>
+                            <div class="schedule-times">
+                                Mer: 15:30-18:30<br>
+                                Gio: 08:30-12:00
+                            </div>
+                        </div>
+                        
+                        <div class="schedule-item">
+                            <div class="doctor-info">
+                                <div class="doctor-name">Dott.ssa PASQUINI</div>
+                            </div>
+                            <div class="schedule-times">
+                                Mar: 09:30-10:30<br>
+                                Gio: 17:00-18:00
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB CONTATTI -->
+            <div id="contacts" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        📞 Contatti Medici Diretti
+                    </div>
+                    <div class="card-content">
+                        <div class="contact-item">
+                            <div class="contact-name">Dott.ssa FORNACIARI</div>
+                            <button class="phone-btn" onclick="callDoctor('Dott.ssa FORNACIARI', '+393203952236')">📞 Chiama</button>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-name">Dott.ssa GOVI</div>
+                            <button class="phone-btn" onclick="callDoctor('Dott.ssa GOVI', '+393388024416')">📞 Chiama</button>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-name">Dott.ssa MANFREDINI</div>
+                            <button class="phone-btn" onclick="callDoctor('Dott.ssa MANFREDINI', '+393387402274')">📞 Chiama</button>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-name">Dott.ssa MOSCHINI</div>
+                            <button class="phone-btn" onclick="callDoctor('Dott.ssa MOSCHINI', '+393356912849')">📞 Chiama</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        🏢 Contatti Studi
+                    </div>
+                    <div class="card-content">
+                        <div class="contact-item">
+                            <div>
+                                <div class="contact-name">Studio Piazza Costituzione</div>
+                                <div style="font-size: 0.8em; color: #7f8c8d;">Sede principale</div>
+                            </div>
+                            <button class="phone-btn" onclick="callStudio('Piazza Costituzione', '+390565034508')">📞 0565 34508</button>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div>
+                                <div class="contact-name">Studio Via De Sanctis</div>
+                                <div style="font-size: 0.8em; color: #7f8c8d;">Sede secondaria</div>
+                            </div>
+                            <button class="phone-btn" onclick="callStudio('Via De Sanctis', '+390565036607')">📞 0565 36607</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB PRENOTAZIONI -->
+            <div id="booking" class="tab-content">
+                <div class="booking-section">
+                    <div class="booking-title">💻 Prenota Online</div>
+                    <div style="text-align: center; margin-bottom: 15px; font-weight: 500;">
+                        Dott.ssa FORNACIARI LARA
+                    </div>
+                    
+                    <div style="font-size: 0.9em; margin-bottom: 15px;">
+                        Sistema di prenotazione semplice in 4 passi:
+                        <div style="margin: 15px 0; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                            1️⃣ Vai al sito cupmedico.it<br>
+                            2️⃣ Scegli data e orario disponibili<br>
+                            3️⃣ Inserisci email e telefono<br>
+                            4️⃣ Ricevi conferma via email
+                        </div>
+                    </div>
+                    
+                    <a href="https://www.cupmedico.it" target="_blank" class="website-btn">
+                        🌐 Vai al sito di prenotazione
+                    </a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        📧 Contatti per Prenotazioni
+                    </div>
+                    <div class="card-content">
+                        <div class="contact-item">
+                            <div>
+                                <div class="contact-name">Segreteria Ricette</div>
+                                <div style="font-size: 0.8em; color: #7f8c8d;">Per appuntamenti e ricette</div>
+                            </div>
+                            <button class="phone-btn" onclick="callStudio('Segreteria', '+390565034508')">📞 0565 34508</button>
+                        </div>
+                        
+                        <div class="info-text">
+                            📧 <strong>Email Segreteria:</strong><br>
+                            segreteria.studiomedicipiombino@gmail.com
+                        </div>
+                        
+                        <div class="info-text">
+                            📧 <strong>Email Dott.ssa Fornaciari:</strong><br>
+                            dr.larafornaciari@gmail.com
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB STRUMENTI -->
+            <div id="tools" class="tab-content">
+                <div class="map-section">
+                    <div class="map-header">🗺️ Come Raggiungere gli Studi</div>
+                    <div class="location-item">
+                        <div class="location-name-map">📍 Studio Piazza Costituzione</div>
+                        <div class="location-address">Piazza della Costituzione, Piombino (LI)</div>
+                        <a href="https://maps.google.com/?q=Piazza+della+Costituzione,+Piombino,+LI" target="_blank" class="direction-btn">🧭 Indicazioni Stradali</a>
+                    </div>
+                    <div class="location-item">
+                        <div class="location-name-map">📍 Studio Via De Sanctis</div>
+                        <div class="location-address">Via Francesco De Sanctis, Piombino (LI)</div>
+                        <a href="https://maps.google.com/?q=Via+Francesco+De+Sanctis,+Piombino,+LI" target="_blank" class="direction-btn">🧭 Indicazioni Stradali</a>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">🔔 Promemoria</div>
+                    <div class="card-content">
+                        <div class="contact-item">
+                            <span>Prossimo promemoria:</span>
+                            <span id="next-reminder">Nessuno attivo</span>
+                        </div>
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button class="phone-btn" onclick="setReminder()">⚙️ Nuovo Promemoria</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">⚡ Azioni Rapide</div>
+                    <div class="card-content">
+                        <div class="contact-item">
+                            <span>🧹 Cancella cronologia</span>
+                            <button onclick="clearCallHistory()" class="phone-btn" style="background: #e74c3c;">Cancella</button>
+                        </div>
+                        <div class="contact-item">
+                            <span>📝 Esporta note</span>
+                            <button onclick="exportNotes()" class="phone-btn">Esporta</button>
+                        </div>
+                        <div class="contact-item">
+                            <span>🔄 Aggiorna stato</span>
+                            <button onclick="updateStatusBanner()" class="phone-btn">Aggiorna</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bottom-padding"></div>
+            </div>
+        </div>
+        
+        <a href="tel:116117" class="floating-emergency" title="Chiamata di emergenza">
+            🚨
+        </a>
+    </div>
+    
+    <script>
+        // Storage simulato in memoria
+        let appStorage = {};
+        
+        // Dati degli orari
+        const doctorsSchedule = {
+            'Dott.ssa MANFREDINI': {
+                'P.za Costituzione': {
+                    'Martedì': [{ start: '16:00', end: '18:30' }],
+                    'Mercoledì': [{ start: '08:00', end: '11:30' }],
+                    'Giovedì': [{ start: '14:00', end: '18:00' }]
+                },
+                'Via De Sanctis': {
+                    'Lunedì': [{ start: '08:00', end: '12:00' }],
+                    'Venerdì': [{ start: '08:00', end: '12:00' }]
+                }
+            },
+            'Dott.ssa MOSCHINI': {
+                'P.za Costituzione': {
+                    'Lunedì': [{ start: '15:00', end: '18:00' }],
+                    'Martedì': [{ start: '08:30', end: '12:30' }],
+                    'Giovedì': [{ start: '08:00', end: '12:00' }],
+                    'Venerdì': [{ start: '08:00', end: '12:00' }]
+                },
+                'Via De Sanctis': {
+                    'Mercoledì': [{ start: '15:00', end: '18:00' }]
+                }
+            },
+            'Dott.ssa GOVI': {
+                'P.za Costituzione': {
+                    'Lunedì': [{ start: '15:00', end: '19:00' }],
+                    'Martedì': [{ start: '08:30', end: '12:00' }],
+                    'Giovedì': [{ start: '15:00', end: '19:00' }]
+                },
+                'Via De Sanctis': {
+                    'Mercoledì': [{ start: '15:30', end: '18:30' }],
+                    'Giovedì': [{ start: '08:30', end: '12:00' }]
+                }
+            },
+            'Dott.ssa FORNACIARI': {
+                'P.za Costituzione': {
+                    'Lunedì': [{ start: '08:45', end: '12:15' }],
+                    'Martedì': [{ start: '15:30', end: '19:00' }],
+                    'Mercoledì': [{ start: '15:30', end: '19:00' }],
+                    'Giovedì': [{ start: '08:45', end: '12:00' }],
+                    'Venerdì': [{ start: '08:45', end: '13:00' }]
+                }
+            },
+            'Dott.ssa PASQUINI': {
+                'P.za Costituzione': {
+                    'Lunedì': [{ start: '08:30', end: '09:30' }],
+                    'Mercoledì': [{ start: '09:30', end: '10:30' }],
+                    'Venerdì': [{ start: '17:00', end: '19:00' }]
+                },
+                'Via De Sanctis': {
+                    'Martedì': [{ start: '09:30', end: '10:30' }],
+                    'Giovedì': [{ start: '17:00', end: '18:00' }]
+                }
+            }
+        };
+        
+        function getCurrentDay() {
+            const days = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+            return days[new Date().getDay()];
+        }
+        
+        function getCurrentTime() {
+            const now = new Date();
+            return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+        }
+        
+        function timeToMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+        
+        function isTimeInRange(currentTime, startTime, endTime) {
+            const current = timeToMinutes(currentTime);
+            const start = timeToMinutes(startTime);
+            const end = timeToMinutes(endTime);
+            return current >= start && current <= end;
+        }
+        
+        function findAvailableNow() {
+            const currentDay = getCurrentDay();
+            const currentTime = getCurrentTime();
+            const available = [];
+            
+            for (const [doctor, locations] of Object.entries(doctorsSchedule)) {
+                for (const [location, schedule] of Object.entries(locations)) {
+                    if (schedule[currentDay]) {
+                        for (const slot of schedule[currentDay]) {
+                            if (isTimeInRange(currentTime, slot.start, slot.end)) {
+                                available.push({
+                                    doctor: doctor,
+                                    location: location,
+                                    until: slot.end
+                                });
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            const resultDiv = document.getElementById('availability-result');
+            const contentDiv = document.getElementById('availability-content');
+            
+            let html = '';
+            
+            if (available.length === 0) {
+                html = `
+                    <div style="text-align: center; color: #e74c3c; padding: 20px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🔴</div>
+                        <div><strong>Nessun medico disponibile ora</strong></div>
+                        <div style="font-size: 0.9em; margin-top: 10px; color: #7f8c8d;">
+                            Oggi è ${currentDay} alle ${currentTime}
+                        </div>
+                    </div>
+                `;
+            } else {
+                html = '<div style="color: #27ae60; font-weight: 500; margin-bottom: 15px;">✅ Medici disponibili ORA:</div>';
+                available.forEach(doc => {
+                    const phoneNumbers = {
+                        'Dott.ssa FORNACIARI': '+393203952236',
+                        'Dott.ssa GOVI': '+393388024416', 
+                        'Dott.ssa MANFREDINI': '+393387402274',
+                        'Dott.ssa MOSCHINI': '+393356912849'
+                    };
+                    html += `
+                        <div class="contact-item">
+                            <div>
+                                <div class="contact-name">${doc.doctor}</div>
+                                <div style="font-size: 0.8em; color: #27ae60;">📍 ${doc.location} • Fino alle ${doc.until}</div>
+                            </div>
+                            <button onclick="callDoctor('${doc.doctor}', '${phoneNumbers[doc.doctor]}')" class="phone-btn">📞 Chiama</button>
+                        </div>
+                    `;
+                });
+            }
+            
+            contentDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+        }
+        
+        function showWaitCalculator() {
+            const currentDay = getCurrentDay();
+            const currentTime = getCurrentTime();
+            const waitDiv = document.getElementById('wait-calculator');
+            const waitTimeDiv = document.getElementById('wait-time');
+            
+            const currentMinutes = timeToMinutes(currentTime);
+            let nextAvailable = null;
+            let minWait = Infinity;
+            
+            for (const [doctor, locations] of Object.entries(doctorsSchedule)) {
+                for (const [location, schedule] of Object.entries(locations)) {
+                    if (schedule[currentDay]) {
+                        for (const slot of schedule[currentDay]) {
+                            const startMinutes = timeToMinutes(slot.start);
+                            if (currentMinutes < startMinutes) {
+                                const wait = startMinutes - currentMinutes;
+                                if (wait < minWait) {
+                                    minWait = wait;
+                                    nextAvailable = {
+                                        doctor: doctor,
+                                        location: location,
+                                        time: slot.start,
+                                        wait: wait
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (nextAvailable) {
+                const hours = Math.floor(minWait / 60);
+                const minutes = minWait % 60;
+                let waitText = hours > 0 ? `${hours}h ${minutes}min` : `${minutes} minuti`;
+                
+                waitTimeDiv.innerHTML = `
+                    <div>${waitText} circa</div>
+                    <div style="font-size: 0.9em; margin-top: 5px; opacity: 0.9;">
+                        Prossimo disponibile: ${nextAvailable.doctor}<br>
+                        📍 ${nextAvailable.location} alle ${nextAvailable.time}
+                    </div>
+                `;
+            } else {
+                waitTimeDiv.innerHTML = 'Nessun orario disponibile oggi';
+            }
+            
+            waitDiv.style.display = 'block';
+            setTimeout(() => {
+                waitDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function callDoctor(doctorName, phoneNumber) {
+            // Registra chiamata
+            const callHistory = appStorage.callHistory || [];
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            
+            callHistory.unshift({
+                doctor: doctorName,
+                time: timeStr,
+                date: now.toLocaleDateString('it-IT')
+            });
+            
+            if (callHistory.length > 10) {
+                callHistory.splice(10);
+            }
+            
+            appStorage.callHistory = callHistory;
+            updateCallHistory();
+            
+            // Effettua chiamata
+            window.location.href = `tel:${phoneNumber}`;
+        }
+        
+        function callStudio(studioName, phoneNumber) {
+            // Registra chiamata
+            const callHistory = appStorage.callHistory || [];
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            
+            callHistory.unshift({
+                doctor: `Studio ${studioName}`,
+                time: timeStr,
+                date: now.toLocaleDateString('it-IT')
+            });
+            
+            if (callHistory.length > 10) {
+                callHistory.splice(10);
+            }
+            
+            appStorage.callHistory = callHistory;
+            updateCallHistory();
+            
+            // Effettua chiamata
+            window.location.href = `tel:${phoneNumber}`;
+        }
+        
+        function updateCallHistory() {
+            const callHistory = appStorage.callHistory || [];
+            const listDiv = document.getElementById('call-history-list');
+            
+            if (callHistory.length === 0) {
+                listDiv.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-style: italic; padding: 20px;">Nessuna chiamata registrata oggi</div>';
+                return;
+            }
+            
+            let html = '';
+            callHistory.forEach(call => {
+                html += `
+                    <div class="history-item">
+                        <div>
+                            <div style="font-weight: 500;">${call.doctor}</div>
+                            <div class="history-time">${call.date}</div>
+                        </div>
+                        <div class="history-time">${call.time}</div>
+                    </div>
+                `;
+            });
+            
+            listDiv.innerHTML = html;
+        }
+        
+        function saveNotes() {
+            const notes = document.getElementById('personal-notes').value;
+            appStorage.personalNotes = notes;
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Salvato!';
+            btn.style.background = '#27ae60';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#3498db';
+            }, 2000);
+        }
+        
+        function loadNotes() {
+            const notes = appStorage.personalNotes || '';
+            document.getElementById('personal-notes').value = notes;
+        }
+        
+        function setReminder() {
+            const time = prompt('⏰ A che ora vuoi essere ricordato? (es: 14:30)');
+            if (time && /^\d{1,2}:\d{2}$/.test(time)) {
+                appStorage.reminder = {
+                    time: time,
+                    date: new Date().toLocaleDateString('it-IT')
+                };
+                updateReminderDisplay();
+                alert('✅ Promemoria impostato per le ' + time);
+            } else if (time) {
+                alert('❌ Formato ora non valido. Usa HH:MM');
+            }
+        }
+        
+        function updateReminderDisplay() {
+            const reminder = appStorage.reminder;
+            const reminderDiv = document.getElementById('next-reminder');
+            
+            if (reminder) {
+                reminderDiv.textContent = `${reminder.date} alle ${reminder.time}`;
+            } else {
+                reminderDiv.textContent = 'Nessuno attivo';
+            }
+        }
+        
+        function showDirections() {
+            alert('🗺️ Vai nella sezione Strumenti per le indicazioni stradali!');
+            showTab('tools');
+        }
+        
+        function clearCallHistory() {
+            if (confirm('🗑️ Vuoi cancellare la cronologia chiamate?')) {
+                appStorage.callHistory = [];
+                updateCallHistory();
+                alert('✅ Cronologia cancellata!');
+            }
+        }
+        
+        function exportNotes() {
+            const notes = appStorage.personalNotes || '';
+            if (!notes.trim()) {
+                alert('📝 Non ci sono note da esportare');
+                return;
+            }
+            
+            const today = new Date().toLocaleDateString('it-IT');
+            const exportText = `Note Studio Medico - ${today}\n\n${notes}`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(exportText).then(() => {
+                    alert('📋 Note copiate negli appunti!');
+                });
+            } else {
+                alert('📝 Note:\n\n' + exportText);
+            }
+        }
+        
+        function updateStatusBanner() {
+            const banner = document.getElementById('status-banner');
+            const currentDay = getCurrentDay();
+            const currentTime = getCurrentTime();
+            const current = timeToMinutes(currentTime);
+            
+            // Orario guardia medica
+            if (current >= timeToMinutes('20:00') || current < timeToMinutes('08:00')) {
+                banner.className = 'status-banner emergency';
+                banner.innerHTML = '🚨 ORARIO GUARDIA MEDICA - Chiama 116117 per urgenze';
+                return;
+            }
+            
+            // Controlla disponibilità medici
+            let anyoneAvailable = false;
+            for (const [doctor, locations] of Object.entries(doctorsSchedule)) {
+                for (const [location, schedule] of Object.entries(locations)) {
+                    if (schedule[currentDay]) {
+                        for (const slot of schedule[currentDay]) {
+                            if (isTimeInRange(currentTime, slot.start, slot.end)) {
+                                anyoneAvailable = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (anyoneAvailable) break;
+                }
+                if (anyoneAvailable) break;
+            }
+            
+            if (anyoneAvailable) {
+                banner.className = 'status-banner';
+                banner.innerHTML = '🟢 Medici disponibili ora - Tocca "Chi è Disponibile ORA?" per dettagli';
+            } else {
+                banner.className = 'status-banner closed';
+                banner.innerHTML = '🔴 Nessun medico disponibile ora - Controlla gli orari';
+            }
+        }
+        
+        function showTab(tabName) {
+            // Nascondi tutti i contenuti
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Rimuovi classe active da tutti i pulsanti
+            const buttons = document.querySelectorAll('.nav-tab');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostra il contenuto selezionato
+            document.getElementById(tabName).classList.add('active');
+            
+            // Attiva il pulsante corrispondente
+            event.target.classList.add('active');
+        }
+        
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatusBanner();
+            updateCallHistory();
+            loadNotes();
+            updateReminderDisplay();
+            
+            // Aggiorna ogni minuto
+            setInterval(updateStatusBanner, 60000);
+        });
+    </script>
+</body>
+</html>
